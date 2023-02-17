@@ -184,6 +184,14 @@ class balistonmod
         }
 
 
+        //replace original handguards by lowers or gasBlocks 
+        replacedItems.forEach(filename => 
+        {
+            let replacedItem = require("./items/" + filename);
+            items[replacedItem._id] = replacedItem;
+
+        });
+
         //add gasblocks to normal ak's
         akWeaponFamillyIds.forEach(ak =>
         {
@@ -230,13 +238,7 @@ class balistonmod
             }
         });
 
-        //replace original handguards by lowers or gasBlocks 
-        replacedItems.forEach(filename => 
-        {
-            let replacedItem = require("./items/" + filename);
-            items[replacedItem._id] = replacedItem;
 
-        });
                
 
         //create new lowers handguards item from separated gasblocks bundles
