@@ -1,0 +1,354 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+
+let mydb;
+
+class balistonmod 
+{
+    postDBLoad(container) 
+    {
+        const logger = container.resolve("WinstonLogger");
+        const modLoader = container.resolve("PreAkiModLoader");
+        const items = container.resolve("DatabaseServer").getTables().templates.items;
+        const handbook = container.resolve("DatabaseServer").getTables().templates.handbook.Items;
+        const locales = container.resolve("DatabaseServer").getTables().locales.global;
+        const globalsPresets = container.resolve("DatabaseServer").getTables().globals["ItemPresets"];
+
+
+        /*
+        const globals = container.resolve("DatabaseServer").getTables().globals;
+        const bots = container.resolve("DatabaseServer").getTables().bots.types;
+        const locations = container.resolve("DatabaseServer").getTables().locations;
+        const weather = container.resolve("ConfigServer").getConfig("aki-weather");
+
+        globals.config.Health.Falling.DamagePerMeter = 1;
+        globals.config.Health.Effects.Existence.EnergyDamage = 0.133;
+        globals.config.Health.Effects.Existence.HydrationDamage = 0.216;
+        globals.config.RestrictionsInRaid = [];
+        globals.config.SkillsSettings.SkillProgressRate = 1;
+
+        //equilibrium mod 
+        for(let botType in bots)
+        {
+            bots[botType].health.BodyParts = [];
+            bots[botType].health.BodyParts[0] = 
+                {
+                    Head: { min: 35, max: 35 },
+                    Chest: { min: 85, max: 85 },
+                    Stomach: { min: 70, max: 70 },
+                    LeftArm: { min: 60, max: 60 },
+                    RightArm: { min: 60, max: 60 },
+                    LeftLeg: { min: 65, max: 65 },
+                    RightLeg: { min: 65, max: 65 }
+                }
+        }
+
+        bots.assault.chances.ArmorVest = 10;
+        bots.assault.generation.items.healing.min = 0;
+        bots.assault.generation.items.healing.max = 0;
+        bots.assault.generation.items.stims.min = 0;
+        bots.assault.generation.items.stims.max = 0;
+        bots.assault.generation.items.grenades.max = 1;
+        
+        //extended raid timer mod
+        const maps = ["factory4_day","factory4_night","bigmap","woods","shoreline","interchange","lighthouse","laboratory","rezervbase","tarkovstreets"];
+        maps.forEach(x => locations[x].base.EscapeTimeLimit *= 3);
+        
+        weather.acceleration = 1;
+        
+        */
+
+
+        /********************************************************************************
+         * 
+         *                           AK SEPARATED HANDGUARDS MODS
+         * 
+         * ******************************************************************************/
+        const fs = require('fs');
+        let replacedItems = [];
+        
+        fs.readdirSync(__dirname + "/items",{ withFileTypes: true }).forEach(file => 
+        {
+            if(file.name != "new") //remove the folder name in the list
+            {
+                replacedItems.push(file.name);
+            }
+
+        });
+
+        let mod_handguard_slot = require("./slot_mod.json");
+
+        const akWeaponFamillyIds = //akweapon familly who use standard sized gastubes
+        [
+            "5ac66d2e5acfc43b321d4b53", //ak-100 familly + ak74 familly
+            "5bf3e0490db83400196199af",
+            "5ac66d725acfc43b321d4b60",
+            "5644bd2b4bdc2d3b4c8b4572",
+            "5ac66cb05acfc40198510a10",
+            "5bf3e03b0db834001d2c4a9c",
+            "5ac66d9b5acfc4001633997a",
+            "5ac4cd105acfc40016339859",
+            "5ac66d015acfc400180ae6e4",
+            "5ab8e9fcd8ce870019439434",
+            "583990e32459771419544dd2",
+
+            "59d6088586f774275f37482f", //AKM
+            "5a0ec13bfcdbcb00165aa685", //AKMN
+            "59ff346386f77477562ff5e2", //AKMS
+            "5abcbc27d8ce8700182eceeb", //AKMSN
+
+            "59e6152586f77473dc057aa1", //vepr-136
+            "59e6687d86f77411d949b251", //vpo-209
+        ]
+
+        const weaponToReplace = //these weapons have new bundles for having a mod_handguard slot (in the .bundle file)   
+        {
+
+            "59d6088586f774275f37482f":"weapons/weapon_izhmash_akm_762x39_new.bundle",
+            "5a0ec13bfcdbcb00165aa685":"weapons/weapon_izhmash_akmn_762x39_new.bundle",
+            "59ff346386f77477562ff5e2":"weapons/weapon_izhmash_akms_762x39_new.bundle",
+            "5abcbc27d8ce8700182eceeb":"weapons/weapon_izhmash_akmsn_762x39_new.bundle",
+            "59e6687d86f77411d949b251":"weapons/weapon_molot_akm_vpo_209_366tkm_new.bundle",
+            "59e6152586f77473dc057aa1":"weapons/weapon_molot_vepr_km_vpo_136_762x39_new.bundle",
+            "628a60ae6b1d481ff772e9c8":"weapons/weapon_rifle_dynamics_704_762x39_new.bundle",
+            "59984ab886f7743e98271174":"weapons/weapon_izhmash_pp-19-01_9x19_new.bundle",
+            "59f9cabd86f7743a10721f46":"weapons/weapon_izhmash_saiga_9_9x19_new.bundle",
+
+            /*  
+            "57dc2fa62459775949412633", //aks-74u
+            "583990e32459771419544dd2", //aks-74un
+            "5839a40f24597726f856b511", //aks-74ub
+            */
+        }
+
+
+        const gasblocks = //list of standard gastubes where you can add non special uppers
+        [
+            "5a01ad4786f77450561fda02",     //vdm cs custom cut
+            "59c6633186f7740cf0493bb9",     //ak-74 gas tube
+            "59d64ec286f774171d1e0a42",     //akm 6P1 gas tube
+            "59e649f986f77411d949b246",     //molot gastube
+            "59ccd11386f77428f24a488f"      //vityaz gas tube
+        ];
+
+
+        const newUpperHanguards= 
+        [
+            "handguard_ak_caa_quad_rail_polymer_upper",
+            "handguard_ak_izhmash_ak74_std_plum_upper",
+            "handguard_ak_khyber_swiss_grather_upper",
+            "handguard_ak_izhmash_ak74_std_wood_upper",
+            "handguard_ak_izhmash_ak74m_std_plastic_upper",
+            "handguard_ak_izhmash_akm_std_wood_upper",
+            "handguard_ak_molot_vepr_km_vpo_136_upper",
+            "handguard_ak_molot_vepr_km_vpo_209_upper",
+            "handguard_ak_magpul_moe_ak_blk_upper",
+            "handguard_ak_magpul_moe_ak_fde_upper",
+            "handguard_ak_magpul_moe_ak_od_upper",
+            "handguard_ak_magpul_moe_ak_plm_upper",
+            "handguard_ak_magpul_moe_ak_sg_upper"
+        ]
+
+        const linkLowerAndUpper = //hanguards with special uppers that don't une standard gasblock locking system
+        {
+            "5cf4e3f3d7f00c06595bc7f0":"handguard_ak_545_design_red_heat_agressor_upper",
+            "59fb375986f7741b681b81a6":"handguard_ak_krebs_ufm_akm_long_upper", 
+            "5a9d56c8a2750c0032157146":"handguard_ak_strike_industries_trax_1_upper",
+            "5f6331e097199b7db2128dc2":"handguard_ak_tdi_x47_upper",
+            "5c17664f2e2216398b5a7e3c":"handguard_ak_vltor_cmrd_upper",
+            "5648b4534bdc2d3d1c8b4580":"handguard_ak_zenit_b19_upper",
+            "5efaf417aeb21837e749c7f2":"handguard_ak_zenit_b31_upper",
+            "6389f1dfc879ce63f72fc43e":"handguard_ak_cnc_guns_ov_gp_upper"
+        }
+
+        const newLowersFromGastubes = 
+        [
+            "handguard_ak_troy_vent_hole_lower",
+            "handguard_ak_vs_vs_33c_lower",
+            "handguard_ak_vs_vs_33c_wht_lower",
+            "handguard_slr_ion_lite_704"
+        ]
+
+        //since both array have akm familly values inside, we must concat and delete duplicates
+        const entireAkFamily = [...new Set([...akWeaponFamillyIds, ...Object.keys(weaponToReplace)])];
+
+
+        //*******************************  CODE **************************************** */
+
+
+        //importing modifed weapon bundles
+        for (const [key, value] of Object.entries(weaponToReplace)) 
+        {
+            items[key]._props.Prefab.path = value;
+        }
+
+
+        //add gasblocks to normal ak's
+        akWeaponFamillyIds.forEach(ak =>
+        {
+            items[ak]._props.Slots.find(slot => slot._name == "mod_gas_block")._props["filters"][0].Filter = 
+            [
+                "5a01ad4786f77450561fda02",
+                "59c6633186f7740cf0493bb9",
+                "59d64ec286f774171d1e0a42",
+                "59e649f986f77411d949b246",
+                "5b237e425acfc4771e1be0b6",
+                "59ccfdba86f7747f2109a587",
+                "5cf656f2d7f00c06585fb6eb"
+            ]
+            
+        });
+
+
+        //enabling mod_handguard slot on each ak
+        entireAkFamily.forEach(ak => 
+        {
+            mod_handguard_slot._id = "mod_handguard_id_"+ak;
+            mod_handguard_slot._parent = ak;
+            items[ak]._props.Slots.push( mod_handguard_slot );
+        })
+
+
+        //remove current handguards on standard gasblocks and fill new upper handguards
+        gasblocks.forEach(gb => 
+        {
+            items[gb]._props.Slots.find(slot => slot._name == "mod_handguard")._required = false;
+
+            if(gb == "5a01ad4786f77450561fda02") //if its  vdm cutted tube
+            { 
+                //remove the entire slot
+                items[gb]._props.Slots = [];
+            }
+            else
+            {
+                //add new uppers ids
+                items[gb]._props.Slots.find(slot => slot._name == "mod_handguard")._props["filters"][0].Filter = newUpperHanguards;
+                //modify prefab path for injecting new bundle
+                items[gb]._props.Prefab.path = "gasblock/"+items[gb]._name+"_new.bundle";
+
+            }
+        });
+
+        //replace original handguards by lowers or gasBlocks 
+        replacedItems.forEach(filename => 
+        {
+            let replacedItem = require("./items/" + filename);
+            items[replacedItem._id] = replacedItem;
+
+        });
+               
+
+        //create new lowers handguards item from separated gasblocks bundles
+        newLowersFromGastubes.forEach(lower => 
+        {
+            let LowerToAddData = require("./items/new/"+lower+".json");
+
+            handbook.push(LowerToAddData.handbook);
+            items[lower] = LowerToAddData.item;
+
+            for (const [lang, localeData] of Object.entries(locales)) //foreach lang
+            {
+                for (const [entry, text] of Object.entries(LowerToAddData.locale)) //and for each entry to add in a locale file
+                {
+                    locales[lang][entry] = text;
+                }                
+            }
+        });
+
+
+        //create new upper items from separated default handguards
+        newUpperHanguards.concat(Object.values(linkLowerAndUpper)).forEach(upper => 
+        {
+            let upperToAddData = require("./items/new/"+upper+".json");
+            handbook.push(upperToAddData.handbook);
+            items[upper] = upperToAddData.item;
+
+            for (const [lang, localeData] of Object.entries(locales)) 
+            {
+                for (const [entry, text] of Object.entries(upperToAddData.locale)) 
+                {
+                    locales[lang][entry] = text;
+                }                
+            }
+        })  
+
+        //gp-25 remove new gasblock conflicts
+        delete items["62e7e7bbe6da9612f743f1e0"]._props.ConflictingItems[items["62e7e7bbe6da9612f743f1e0"]._props.ConflictingItems.indexOf("5cf656f2d7f00c06585fb6eb")];
+        delete items["62e7e7bbe6da9612f743f1e0"]._props.ConflictingItems[items["62e7e7bbe6da9612f743f1e0"]._props.ConflictingItems.indexOf("5cf656f2d7f00c06585fb6eb")];
+
+
+        /* 
+        //a function for a lazy and clever baliston : )
+        let jsonToCreate = require("./items/modified.json");
+        var fs = require('fs');
+        jsonToCreate.forEach(item => 
+        {
+            fs.appendFile("D:/tarkov/EFT2/user/mods/BALIST0N-testmod/items/"+items[item]._name+".json", JSON.stringify(items[item], null, "\t"), function(err, result) 
+            {
+                if(err) console.log('error', err);
+            });
+        })
+        */
+
+
+
+        /********************************* Script for modifying presets ************************************************/
+
+        for(let preset in globalsPresets)
+        {
+            let parentItem = globalsPresets[preset]._items.find(item => item._id == globalsPresets[preset]._parent );
+
+            if(entireAkFamily.indexOf(parentItem._tpl) != -1 ) //if the preset base weapon  is an ak family weapon
+            {   
+                let oldHandguard = globalsPresets[preset]._items.find(item => item.slotId == "mod_handguard" )
+                if( oldHandguard?.parentId !== undefined)
+                {
+                    globalsPresets[preset]._items.find(item => item.slotId == "mod_handguard" ).parentId = parentItem._id;
+                    
+                    let newUpper = oldHandguard._tpl;
+                    let actualHandguard = items[oldHandguard._tpl]._name;
+
+                    newUpperHanguards.forEach(upper => 
+                    {
+                        if(upper.includes(actualHandguard) == true )
+                        {
+                            newUpper = upper;
+                        }
+                    });
+
+                    globalsPresets[preset]._items.push(
+                    {
+                        "_id": (Math.random() * 0xfffff * 1000000).toString(16),
+                        "_tpl": newUpper,
+                        "parentId": globalsPresets[preset]._items.find(item => item.slotId == "mod_gas_block" )._id,
+                        "slotId": "mod_handguard"
+                    });
+
+                }
+                else
+                {
+                    globalsPresets[preset]._items.push({
+                        "_id": (Math.random() * 0xfffff * 1000000).toString(16),
+                        "_tpl": "handguard_slr_ion_lite_704",
+                        "parentId": parentItem._id,
+                        "slotId": "mod_handguard"
+                      });
+                }
+                
+            }
+        }
+
+
+        //for testing purposes 
+        for(let item in items)
+        {
+            items[item]._props.ExaminedByDefault = true;
+            items[item]._props.CanSellOnRagfair = true;
+        }
+
+    }
+
+}
+
+module.exports = { mod: new balistonmod() };
