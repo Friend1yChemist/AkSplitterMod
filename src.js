@@ -14,7 +14,9 @@ class balistonmod
         const handbook = container.resolve("DatabaseServer").getTables().templates.handbook.Items;
         const locales = container.resolve("DatabaseServer").getTables().locales.global;
         const traders = container.resolve("DatabaseServer").getTables().traders;
+        //const quests = container.resolve("DatabaseServer").getTables().tamplates.quests;
         const globalsPresets = container.resolve("DatabaseServer").getTables().globals["ItemPresets"];
+        const bots =  container.resolve("DatabaseServer").getTables().bots.types;
 
 
         /*
@@ -382,6 +384,19 @@ class balistonmod
 
         }
         
+        /***********************************************  BOT GENERATION FIXING ****************************************/
+
+        for(let botType in bots)
+        {
+            for(let weapon in bots[botType].inventory.mods)
+            {
+                if(entireAkFamily.indexOf(weapon) != -1 ) //if the preset base weapon  is an ak family weapon
+                {
+                    bots[botType].inventory.mods[weapon]["mod_handguard"] = mod_handguard_slot._props.filters[0].filters;
+                }
+            }
+        }
+
 
         //for testing purposes 
         for(let item in items)
