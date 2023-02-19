@@ -13,6 +13,7 @@ class balistonmod
         const items = container.resolve("DatabaseServer").getTables().templates.items;
         const handbook = container.resolve("DatabaseServer").getTables().templates.handbook.Items;
         const locales = container.resolve("DatabaseServer").getTables().locales.global;
+        const traders = container.resolve("DatabaseServer").getTables().traders;
         const globalsPresets = container.resolve("DatabaseServer").getTables().globals["ItemPresets"];
 
 
@@ -91,7 +92,6 @@ class balistonmod
             "5ac4cd105acfc40016339859",
             "5ac66d015acfc400180ae6e4",
             "5ab8e9fcd8ce870019439434",
-            "583990e32459771419544dd2",
 
             "59d6088586f774275f37482f", //AKM
             "5a0ec13bfcdbcb00165aa685", //AKMN
@@ -227,6 +227,7 @@ class balistonmod
             { 
                 //remove the entire slot
                 items[gb]._props.Slots = [];
+                items[gb]._props.Weight = 0.096;
             }
             else
             {
@@ -280,21 +281,6 @@ class balistonmod
         delete items["62e7e7bbe6da9612f743f1e0"]._props.ConflictingItems[items["62e7e7bbe6da9612f743f1e0"]._props.ConflictingItems.indexOf("5cf656f2d7f00c06585fb6eb")];
 
 
-        /* 
-        //a function for a lazy and clever baliston : )
-        let jsonToCreate = require("./items/modified.json");
-        var fs = require('fs');
-        jsonToCreate.forEach(item => 
-        {
-            fs.appendFile("D:/tarkov/EFT2/user/mods/BALIST0N-testmod/items/"+items[item]._name+".json", JSON.stringify(items[item], null, "\t"), function(err, result) 
-            {
-                if(err) console.log('error', err);
-            });
-        })
-        */
-
-
-
         /********************************* Script for modifying presets ************************************************/
 
         for(let preset in globalsPresets)
@@ -321,7 +307,7 @@ class balistonmod
 
                     globalsPresets[preset]._items.push(
                     {
-                        "_id": (Math.random() * 0xfffff * 1000000).toString(16),
+                        "_id": (Math.random() * 0xffffffffffffffffffffffff).toString(16),
                         "_tpl": newUpper,
                         "parentId": globalsPresets[preset]._items.find(item => item.slotId == "mod_gas_block" )._id,
                         "slotId": "mod_handguard"
@@ -331,7 +317,7 @@ class balistonmod
                 else
                 {
                     globalsPresets[preset]._items.push({
-                        "_id": (Math.random() * 0xfffff * 1000000).toString(16),
+                        "_id": (Math.random() * 0xffffffffffffffffffffffff).toString(16),
                         "_tpl": "handguard_slr_ion_lite_704",
                         "parentId": parentItem._id,
                         "slotId": "mod_handguard"
@@ -342,13 +328,87 @@ class balistonmod
         }
 
 
+
+        /************************************ TRADERS ASSORT FIXING *********************************/
+        for(let trader in traders)
+        {
+            if(traders[trader].base.nickname != "caretaker" && trader != "ragfair")
+            {
+                for(let assortItem in traders[trader].assort.items)
+                {
+                    if(entireAkFamily.indexOf(traders[trader].assort.items[assortItem]._tpl) != -1 ) //if the preset base weapon  is an ak family weapon
+                    {   
+                        let weaponId = traders[trader].assort.items[assortItem]._id;
+
+                        let childs = traders[trader].assort.items.filter(assortItem2 => assortItem2.parentId == weaponId);
+
+                        childs.forEach(child =>
+                        {
+                            childs = childs.concat(traders[trader].assort.items.filter(assortItem2 => assortItem2.parentId == child._id))
+                        });
+
+                        childs = WeaponFixer(childs,weaponId);
+                        
+                        childs.forEach(child => 
+                        {   
+                            let index = traders[trader].assort.items.findIndex(item => item._id == child._id)
+                            traders[trader].assort.items[index] = child;
+                        })
+                    }
+                }
+            }
+
+        }
+        
+
         //for testing purposes 
         for(let item in items)
         {
             items[item]._props.ExaminedByDefault = true;
             items[item]._props.CanSellOnRagfair = true;
         }
+        
+        
+        function WeaponFixer(weapon,weaponParentId)
+        {
+            let upperToAdd = {};
+            weapon.forEach(weaponPart => 
+            {
+                if(weaponPart.slotId == "mod_handguard")
+                {
+                    weaponPart.parentId = weaponParentId
+                    let upperHandguard = newUpperHanguards.find(upper => upper.includes(items[weaponPart._tpl]._name))
+                    if(upperHandguard !== undefined)
+                    {
+                        upperToAdd = 
+                        {
+                            "_id": (Math.random() * 0xffffffffffffffffffffffff).toString(16),
+                            "_tpl": upperHandguard,
+                            "parentId": weapon.find(weaponPart2 => weaponPart2.slotId == "mod_gas_block")._id ,
+                            "slotId": "mod_handguard"
+                        };
+                    }
+                    else
+                    {
+                        upperHandguard = linkLowerAndUpper[weaponPart._tpl];
+                        upperToAdd = 
+                        {
+                            "_id": (Math.random() * 0xffffffffffffffffffffffff).toString(16),
+                            "_tpl": upperHandguard,
+                            "parentId": weaponPart._id,
+                            "slotId": "mod_handguard"
+                        };
+                    }
+                }
+            });
 
+            if(Object.keys(upperToAdd).length > 0 )
+            {
+                weapon.push(upperToAdd);
+            }
+            
+            return weapon;
+        }
     }
 
 }

@@ -1,8 +1,8 @@
 {
-    "name": "TestMod",
+    "name": "Kalashnikov Advanced Modding",
     "version": "1.0.0",
     "main": "src.js",
-    "license": "",
+    "license": "NCSA",
     "author": "BALIST0N",
     "akiVersion": "3.5.0",
     "scripts": {
