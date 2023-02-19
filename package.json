@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "main": "src.js",
     "license": "NCSA",
-    "author": "BALIST0N",
+    "author": "BALIST0N, ChoccyTheMagician",
     "akiVersion": "3.5.0",
     "scripts": {
         "setup:environment": "npm i",
