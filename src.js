@@ -392,7 +392,7 @@ class balistonmod
             {
                 if(entireAkFamily.indexOf(weapon) != -1 ) //if the preset base weapon  is an ak family weapon
                 {
-                    bots[botType].inventory.mods[weapon]["mod_handguard"] = mod_handguard_slot._props.filters[0].filters;
+                    bots[botType].inventory.mods[weapon]["mod_handguard"] = mod_handguard_slot._props.filters[0].Filter;
                 }
             }
         }
