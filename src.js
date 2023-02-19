@@ -19,55 +19,7 @@ class balistonmod
         const bots =  container.resolve("DatabaseServer").getTables().bots.types;
 
 
-        /*
-        const globals = container.resolve("DatabaseServer").getTables().globals;
-        const bots = container.resolve("DatabaseServer").getTables().bots.types;
-        const locations = container.resolve("DatabaseServer").getTables().locations;
-        const weather = container.resolve("ConfigServer").getConfig("aki-weather");
-
-        globals.config.Health.Falling.DamagePerMeter = 1;
-        globals.config.Health.Effects.Existence.EnergyDamage = 0.133;
-        globals.config.Health.Effects.Existence.HydrationDamage = 0.216;
-        globals.config.RestrictionsInRaid = [];
-        globals.config.SkillsSettings.SkillProgressRate = 1;
-
-        //equilibrium mod 
-        for(let botType in bots)
-        {
-            bots[botType].health.BodyParts = [];
-            bots[botType].health.BodyParts[0] = 
-                {
-                    Head: { min: 35, max: 35 },
-                    Chest: { min: 85, max: 85 },
-                    Stomach: { min: 70, max: 70 },
-                    LeftArm: { min: 60, max: 60 },
-                    RightArm: { min: 60, max: 60 },
-                    LeftLeg: { min: 65, max: 65 },
-                    RightLeg: { min: 65, max: 65 }
-                }
-        }
-
-        bots.assault.chances.ArmorVest = 10;
-        bots.assault.generation.items.healing.min = 0;
-        bots.assault.generation.items.healing.max = 0;
-        bots.assault.generation.items.stims.min = 0;
-        bots.assault.generation.items.stims.max = 0;
-        bots.assault.generation.items.grenades.max = 1;
-        
-        //extended raid timer mod
-        const maps = ["factory4_day","factory4_night","bigmap","woods","shoreline","interchange","lighthouse","laboratory","rezervbase","tarkovstreets"];
-        maps.forEach(x => locations[x].base.EscapeTimeLimit *= 3);
-        
-        weather.acceleration = 1;
-        
-        */
-
-
-        /********************************************************************************
-         * 
-         *                           AK SEPARATED HANDGUARDS MODS
-         * 
-         * ******************************************************************************/
+        /*************************************  DATA  ********************************************/
         const fs = require('fs');
         let replacedItems = [];
         
@@ -125,6 +77,10 @@ class balistonmod
         }
 
 
+        //since both array have akm familly values inside, we must concat and delete duplicates
+        const entireAkFamily = [...new Set([...akWeaponFamillyIds, ...Object.keys(weaponToReplace)])];
+
+
         const gasblocks = //list of standard gastubes where you can add non special uppers
         [
             "5a01ad4786f77450561fda02",     //vdm cs custom cut
@@ -172,11 +128,10 @@ class balistonmod
             "handguard_slr_ion_lite_704"
         ]
 
-        //since both array have akm familly values inside, we must concat and delete duplicates
-        const entireAkFamily = [...new Set([...akWeaponFamillyIds, ...Object.keys(weaponToReplace)])];
 
 
-        //*******************************  CODE **************************************** */
+
+        //*******************************  CODE AND DATA **************************************** */
 
 
         //importing modifed weapon bundles
@@ -410,7 +365,7 @@ class balistonmod
                 if(reward.items.find(itemReward => entireAkFamily.indexOf(itemReward._tpl) != -1 ) !== undefined )
                 {
                     reward.items = WeaponFixer(reward.items,reward.target);
-                    console.log(quests[quest].QuestName + " -> "+  items[reward.items[0]._tpl]._name );
+                    //console.log(quests[quest].QuestName + " -> "+  items[reward.items[0]._tpl]._name );
                 }
             })
         }
