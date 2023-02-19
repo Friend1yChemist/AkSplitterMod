@@ -14,7 +14,7 @@ class balistonmod
         const handbook = container.resolve("DatabaseServer").getTables().templates.handbook.Items;
         const locales = container.resolve("DatabaseServer").getTables().locales.global;
         const traders = container.resolve("DatabaseServer").getTables().traders;
-        //const quests = container.resolve("DatabaseServer").getTables().tamplates.quests;
+        const quests = container.resolve("DatabaseServer").getTables().templates.quests;
         const globalsPresets = container.resolve("DatabaseServer").getTables().globals["ItemPresets"];
         const bots =  container.resolve("DatabaseServer").getTables().bots.types;
 
@@ -398,53 +398,90 @@ class balistonmod
         }
 
 
+
+
+        /******************************************************* QUESTS REWARDS FIXING SCRIPT **********************************************************/
+
+
+        for(let quest in quests)
+        {
+            quests[quest].rewards["Success"].filter(reward => reward.type == "Item").forEach(reward => 
+            {
+                if(reward.items.find(itemReward => entireAkFamily.indexOf(itemReward._tpl) != -1 ) !== undefined )
+                {
+                    reward.items = WeaponFixer(reward.items,reward.target);
+                    console.log(quests[quest].QuestName + " -> "+  items[reward.items[0]._tpl]._name );
+                }
+            })
+        }
+
+
+        /***************************************** FUNCTIONS **************************************************/
+        
+        
+        function WeaponFixer(weapon,weaponParentId)
+        {
+            let baseweapon = weapon.find(weaponPart => entireAkFamily.indexOf(weaponPart._tpl) != -1 );
+            if( baseweapon !== undefined && baseweapon._tpl == "628a60ae6b1d481ff772e9c8")
+            {
+                weapon.push(
+                {
+                    "_id": (Math.random() * 0xffffffffffffffffffffffff).toString(16),
+                    "_tpl": "handguard_slr_ion_lite_704",
+                    "parentId": baseweapon._id,
+                    "slotId": "mod_handguard"
+                });
+            }
+            else
+            {
+                let upperToAdd = {};
+                weapon.forEach(weaponPart => 
+                {
+                    if(weaponPart.slotId == "mod_handguard")
+                    {
+                        weaponPart.parentId = weaponParentId
+                        let upperHandguard = newUpperHanguards.find(upper => upper.includes(items[weaponPart._tpl]._name))
+                        if(upperHandguard !== undefined)
+                        {
+                            upperToAdd = 
+                            {
+                                "_id": (Math.random() * 0xffffffffffffffffffffffff).toString(16),
+                                "_tpl": upperHandguard,
+                                "parentId": weapon.find(weaponPart2 => weaponPart2.slotId == "mod_gas_block")._id ,
+                                "slotId": "mod_handguard"
+                            };
+                        }
+                        else
+                        {
+                            upperHandguard = linkLowerAndUpper[weaponPart._tpl];
+                            upperToAdd = 
+                            {
+                                "_id": (Math.random() * 0xffffffffffffffffffffffff).toString(16),
+                                "_tpl": upperHandguard,
+                                "parentId": weaponPart._id,
+                                "slotId": "mod_handguard"
+                            };
+                        }
+                    }
+                });
+    
+                if(Object.keys(upperToAdd).length > 0 )
+                {
+                    weapon.push(upperToAdd);
+                }
+            }
+
+
+            
+            return weapon;
+        }
+
+
         //for testing purposes 
         for(let item in items)
         {
             items[item]._props.ExaminedByDefault = true;
             items[item]._props.CanSellOnRagfair = true;
-        }
-        
-        
-        function WeaponFixer(weapon,weaponParentId)
-        {
-            let upperToAdd = {};
-            weapon.forEach(weaponPart => 
-            {
-                if(weaponPart.slotId == "mod_handguard")
-                {
-                    weaponPart.parentId = weaponParentId
-                    let upperHandguard = newUpperHanguards.find(upper => upper.includes(items[weaponPart._tpl]._name))
-                    if(upperHandguard !== undefined)
-                    {
-                        upperToAdd = 
-                        {
-                            "_id": (Math.random() * 0xffffffffffffffffffffffff).toString(16),
-                            "_tpl": upperHandguard,
-                            "parentId": weapon.find(weaponPart2 => weaponPart2.slotId == "mod_gas_block")._id ,
-                            "slotId": "mod_handguard"
-                        };
-                    }
-                    else
-                    {
-                        upperHandguard = linkLowerAndUpper[weaponPart._tpl];
-                        upperToAdd = 
-                        {
-                            "_id": (Math.random() * 0xffffffffffffffffffffffff).toString(16),
-                            "_tpl": upperHandguard,
-                            "parentId": weaponPart._id,
-                            "slotId": "mod_handguard"
-                        };
-                    }
-                }
-            });
-
-            if(Object.keys(upperToAdd).length > 0 )
-            {
-                weapon.push(upperToAdd);
-            }
-            
-            return weapon;
         }
     }
 
