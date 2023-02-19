@@ -340,20 +340,42 @@ class balistonmod
                     {   
                         let weaponId = traders[trader].assort.items[assortItem]._id;
 
-                        let childs = traders[trader].assort.items.filter(assortItem2 => assortItem2.parentId == weaponId);
-
-                        childs.forEach(child =>
+                        if(traders[trader].assort.items[assortItem]._tpl == "628a60ae6b1d481ff772e9c8")
                         {
-                            childs = childs.concat(traders[trader].assort.items.filter(assortItem2 => assortItem2.parentId == child._id))
-                        });
+                            traders[trader].assort.items.push(
+                            {
+                                "_id": (Math.random() * 0xffffffffffffffffffffffff).toString(16),
+                                "_tpl": "handguard_slr_ion_lite_704",
+                                "parentId": weaponId,
+                                "slotId": "mod_handguard"
+                            });
+                        }
+                        else
+                        {
+                            let childs = traders[trader].assort.items.filter(assortItem2 => assortItem2.parentId == weaponId);
+    
+                            childs.forEach(child =>
+                            {
+                                childs = childs.concat(traders[trader].assort.items.filter(assortItem2 => assortItem2.parentId == child._id))
+                            });
+    
+                            childs = WeaponFixer(childs,weaponId);
+                            
+                            childs.forEach(child => 
+                            {   
+                                let index = traders[trader].assort.items.findIndex(item => item._id == child._id)
+                                if(index > -1)
+                                {
+                                    traders[trader].assort.items[index] = child;
+                                }
+                                else
+                                {
+                                    traders[trader].assort.items.push(child);
+                                }
+    
+                            })
+                        }
 
-                        childs = WeaponFixer(childs,weaponId);
-                        
-                        childs.forEach(child => 
-                        {   
-                            let index = traders[trader].assort.items.findIndex(item => item._id == child._id)
-                            traders[trader].assort.items[index] = child;
-                        })
                     }
                 }
             }
