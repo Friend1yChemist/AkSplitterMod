@@ -2,10 +2,8 @@
 
 Object.defineProperty(exports, "__esModule", { value: true });
 
-let mydb;
-
-class balistonmod 
-{
+class AkSplitterMod 
+{   
     postDBLoad(container) 
     {
         const logger = container.resolve("WinstonLogger");
@@ -341,15 +339,13 @@ class balistonmod
         
         /***********************************************  BOT GENERATION FIXING ****************************************/
 
-        let allHandguards = mod_handguard_slot._props.filters[0].Filter.concat(newUpperHanguards).concat(Object.values(linkLowerAndUpper)).concat(newLowersFromGastubes);
-
         for(let botType in bots)
         {
             for(let weapon in bots[botType].inventory.mods)
             {
                 if(entireAkFamily.indexOf(weapon) != -1 ) //if the preset base weapon is an ak family weapon
                 {
-                    bots[botType].inventory.mods[weapon]["mod_handguard"] = allHandguards;
+                    bots[botType].inventory.mods[weapon]["mod_handguard"] = mod_handguard_slot._props.filters[0].Filter;
                 }
             }
         }
@@ -444,4 +440,4 @@ class balistonmod
 
 }
 
-module.exports = { mod: new balistonmod() };
+module.exports = { mod: new AkSplitterMod() };
