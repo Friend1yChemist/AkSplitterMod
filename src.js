@@ -338,48 +338,78 @@ class AkSplitterMod
         }
         
         /***********************************************  BOT GENERATION FIXING ****************************************/
+
+        
         let lowers = mod_handguard_slot._props.filters[0].Filter
+        let  botTypeModsData = {};
         for(let botType in bots)
         {
             for(let weapon in bots[botType].inventory.mods)
             {
                 if(entireAkFamily.indexOf(weapon) != -1 ) //if the preset base weapon is an ak family weapon
                 {
+                    let gasblocksRequired = items[weapon]._props.Slots.find(slot => slot._name == "mod_gas_block")._props.filters[0].Filter;
                     bots[botType].inventory.mods[weapon]["mod_handguard"] = lowers;
+                    bots[botType].inventory.mods[weapon]["mod_gas_block"] = gasblocksRequired;
+
+                    gasblocksRequired.forEach(gb =>
+                    {
+                        if(items[gb]._props.Slots.length > 0)
+                        {
+                            bots[botType].inventory.mods[gb] = {}
+                            items[gb]._props.Slots.forEach(slot => 
+                            {
+                                bots[botType].inventory.mods[gb][slot._name] = slot._props.filters[0].Filter;
+                            })
+                        }
+                    })
+
                 }
-            }
-            
-            gasblocks.forEach(gasblock => 
-            {
-                bots[botType].inventory.mods[gasblock]= { "mod_handguard":[] };
-                bots[botType].inventory.mods[gasblock]["mod_handguard"] = newUpperHanguards;
-            });
-
-            bots[botType].inventory.mods["5a01ad4786f77450561fda02"] = {}; 
-
-            for (const [key, value] of Object.entries(linkLowerAndUpper)) 
-            {
-                bots[botType].inventory.mods[key] = { "mod_handguard":[] };
-                bots[botType].inventory.mods[key]["mod_handguard"] = [value];
             }
 
             lowers.forEach(lower => 
             {
-                items[lower]._props.Slots.forEach(slot => 
+                if(items[lower]._props.Slots.length > 0)
+                {
+                    bots[botType].inventory.mods[lower] = {}
+                    items[lower]._props.Slots.forEach(slot => 
                     {
-                    bots[botType].inventory.mods[lower] = { [slot._name] : slot._props.filters[0].Filter }
-                });
+                        bots[botType].inventory.mods[lower][slot._name] = slot._props.filters[0].Filter;
+                    })
+                }
+
             });
 
-            Object.values(linkLowerAndUpper).forEach(upper => 
+            newUpperHanguards.forEach(upper => 
             {
-                items[upper]._props.Slots.forEach(slot => 
+                if(items[upper]._props.Slots.length > 0)
                 {
-                    bots[botType].inventory.mods[upper] = { [slot._name] : slot._props.filters[0].Filter }
-                });
+                    bots[botType].inventory.mods[upper] = {}
+
+                    items[upper]._props.Slots.forEach(slot => 
+                    {
+                        bots[botType].inventory.mods[upper][slot._name] = slot._props.filters[0].Filter;
+                    })
+                }
+
             });
-            
+
+            Object.values(linkLowerAndUpper).forEach(specUpper => 
+            {
+                bots[botType].inventory.mods[specUpper] = {}
+
+                items[specUpper]._props.Slots.forEach(slot => 
+                {
+                    bots[botType].inventory.mods[specUpper][slot._name] = slot._props.filters[0].Filter;
+                })
+                
+            })
+
+            botTypeModsData[botType] = bots[botType].inventory.mods
+
         }
+            
+        //fs.writeFileSync(__dirname + "/bot_mods.json", JSON.stringify(botTypeModsData, null, 4) );
 
 
 
