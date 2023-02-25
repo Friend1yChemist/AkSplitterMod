@@ -490,13 +490,6 @@ class AkSplitterMod
             return weapon;
         }
 
-
-        //for testing purposes 
-        for(let item in items)
-        {
-            items[item]._props.ExaminedByDefault = true;
-            items[item]._props.CanSellOnRagfair = true;
-        }
     }
 
 }
