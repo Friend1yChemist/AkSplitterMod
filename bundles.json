@@ -98,10 +98,19 @@
 			"dependencyKeys": 
             [
                 "shaders",
-                "assets/content/items/mods/handguards/handguard_ak_izhmash_ak74m_std_plastic_mesh",
+                "handguards/handguard_ak_izhmash_ak74m_std_plastic_lower_mesh",
                 "assets/commonassets/physics/physicsmaterials.bundle",
                 "cubemaps",
                 "assets/content/items/mods/handguards/handguard_pp-19-01_izhmash_vityaz_std_plastic_textures.bundle"
+            ]
+        },
+        {
+			"key": "handguards/handguard_ak_izhmash_ak74m_std_plastic_lower_mesh",
+			"dependencyKeys": 
+            [
+                "shaders",
+                "assets/content/items/mods/handguards/handguard_pp-19-01_izhmash_vityaz_std_plastic_textures.bundle",
+                "cubemaps"
             ]
         },
         {
@@ -443,10 +452,19 @@
 			"dependencyKeys": 
             [
                 "shaders",
-                "assets/content/items/mods/handguards/handguard_ak_izhmash_ak74m_std_plastic_mesh",       
+                "handguards/uppers/handguard_ak_izhmash_ak74m_std_plastic_upper_mesh",       
                 "assets/commonassets/physics/physicsmaterials.bundle",   
                 "cubemaps",
                 "assets/content/items/mods/handguards/handguard_pp-19-01_izhmash_vityaz_std_plastic_textures.bundle"
+            ]
+        },
+        {
+			"key": "handguards/uppers/handguard_ak_izhmash_ak74m_std_plastic_upper_mesh",
+			"dependencyKeys": 
+            [
+                "shaders",
+                "assets/content/items/mods/handguards/handguard_pp-19-01_izhmash_vityaz_std_plastic_textures.bundle",
+                "cubemaps"
             ]
         },
         {
