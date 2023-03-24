@@ -338,80 +338,59 @@ class AkSplitterMod
         }
         
         /***********************************************  BOT GENERATION FIXING ****************************************/
-
         
-        let lowers = mod_handguard_slot._props.filters[0].Filter
-        let  botTypeModsData = {};
+ 
+        let botTypeModsData = {};
+
         for(let botType in bots)
         {
+            let gasblocks = [];
             for(let weapon in bots[botType].inventory.mods)
             {
                 if(entireAkFamily.indexOf(weapon) != -1 ) //if the preset base weapon is an ak family weapon
                 {
-                    let gasblocksRequired = items[weapon]._props.Slots.find(slot => slot._name == "mod_gas_block")._props.filters[0].Filter;
-                    bots[botType].inventory.mods[weapon]["mod_handguard"] = lowers;
-                    bots[botType].inventory.mods[weapon]["mod_gas_block"] = gasblocksRequired;
-
-                    gasblocksRequired.forEach(gb =>
+                    bots[botType].inventory.mods[weapon]["mod_handguard"] = []
+                    bots[botType].inventory.mods[weapon]["mod_gas_block"].forEach( gasblock => 
                     {
-                        if(items[gb]._props.Slots.length > 0)
+                        if(gasblocks.includes(gasblock) == false )
                         {
-                            bots[botType].inventory.mods[gb] = {}
-                            items[gb]._props.Slots.forEach(slot => 
-                            {
-                                bots[botType].inventory.mods[gb][slot._name] = slot._props.filters[0].Filter;
-                            })
+                            gasblocks.push( gasblock );
                         }
                     })
-
                 }
             }
 
-            lowers.forEach(lower => 
-            {
-                if(items[lower]._props.Slots.length > 0)
+            gasblocks.forEach(gasblock => 
+            {   
+                if(bots[botType].inventory.mods[gasblock] !== undefined)
                 {
-                    bots[botType].inventory.mods[lower] = {}
-                    items[lower]._props.Slots.forEach(slot => 
-                    {
-                        bots[botType].inventory.mods[lower][slot._name] = slot._props.filters[0].Filter;
-                    })
+                    if(bots[botType].inventory.mods[gasblock]["mod_handguard"] !== undefined)
+                    {   
+                        for(let weapon in bots[botType].inventory.mods)
+                        {
+                            if(entireAkFamily.indexOf(weapon) != -1 ) //if the preset base weapon is an ak family weapon
+                            {
+                                bots[botType].inventory.mods[weapon]["mod_handguard"] = bots[botType].inventory.mods[weapon]["mod_handguard"].concat(bots[botType].inventory.mods[gasblock]["mod_handguard"]);
+                            }
+                        }
+                        bots[botType].inventory.mods[gasblock]["mod_handguard"] = newUpperHanguards;
+                    }
+                    else
+                    {                               
+                        //combo gas tube ...
+                    }
                 }
-
-            });
-
-            newUpperHanguards.forEach(upper => 
-            {
-                if(items[upper]._props.Slots.length > 0)
+                else
                 {
-                    bots[botType].inventory.mods[upper] = {}
-
-                    items[upper]._props.Slots.forEach(slot => 
-                    {
-                        bots[botType].inventory.mods[upper][slot._name] = slot._props.filters[0].Filter;
-                    })
+                    //bots[botType].inventory.mods["628a60ae6b1d481ff772e9c8"]["mod_handguard"] = ["handguard_slr_ion_lite_704"]
                 }
-
-            });
-
-            Object.values(linkLowerAndUpper).forEach(specUpper => 
-            {
-                bots[botType].inventory.mods[specUpper] = {}
-
-                items[specUpper]._props.Slots.forEach(slot => 
-                {
-                    bots[botType].inventory.mods[specUpper][slot._name] = slot._props.filters[0].Filter;
-                })
                 
             })
 
             botTypeModsData[botType] = bots[botType].inventory.mods
-
         }
-            
+          
         //fs.writeFileSync(__dirname + "/bot_mods.json", JSON.stringify(botTypeModsData, null, 4) );
-
-
 
 
         /******************************************************* QUESTS REWARDS FIXING SCRIPT **********************************************************/
@@ -432,7 +411,7 @@ class AkSplitterMod
 
         /***************************************** FUNCTIONS **************************************************/
         
-        
+
         function WeaponFixer(weapon,weaponParentId)
         {
             let baseweapon = weapon.find(weaponPart => entireAkFamily.indexOf(weaponPart._tpl) != -1 );
